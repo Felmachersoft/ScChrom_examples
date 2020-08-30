@@ -1,0 +1,132 @@
+//{"author":"Felmachersoft","license":"MIT","description":"A borderless video viewer with overlay menu."}
+--url=https://www.youtube.com/watch?v=DQI_heTQG1g
+--window-topmost=true
+--window-hide_url_field=true
+--window-prevent_stealing_focus=true
+--window-border=none
+--window-width=640
+--window-height=360
+--window-pos-x=-100
+--window-pos-y=-100
+--request-whitelist=*youtube.com*|*.googleapis*|*yt3.*|*ytimg.com*|*googlevideo.com*
+--browser-js-allow_objects=InputController,WindowController
+--injected-javascript=
+
+var ignoreInnerMouse = false;
+
+function injectMenu() {
+  // already intialized?
+  if(document.getElementsByClassName('scchrom_menu').length > 0)
+    return;
+
+  const div = document.createElement('div');
+
+  div.classList.add("scchrom_menu");
+
+  div.innerHTML = `
+  <style>
+    .scchrom_menu {
+      display:none;
+      position: "fixed";
+      top: 10px;
+      left: 25%;
+      z-Index: 10000;
+      background: darkgray;
+      margin: 5px;      
+    }
+    .menuRow {
+      position: fixed;
+      top: 2px;
+      right: 2px;
+      z-index: 10000;
+      background: darkgray;
+      margin: 5px;
+      border: 3px;
+      border-radius: 10px;
+      display: flex;
+    }
+    .menuIcon {
+      cursor: pointer;
+      font-size: 2em;
+      margin:5px;
+    }
+  </style>
+  <div class="menuRow">
+    <div class="menuIcon minimizeMe" style="-webkit-app-region: drag;">_</div>
+    <div class="menuIcon" style="-webkit-app-region: drag;cursor: all-scroll;">✥</div>    
+    <div class="menuIcon closeMe">✖</div>
+  </div>
+  `;
+
+  document.body.appendChild(div);
+  
+  document.body.addEventListener("mousedown", (e) => {
+    
+    let cl = e.target.classList;
+    if(cl.contains('minimizeMe')){
+      ScChrom.WindowController.setWindowState('minimized');
+    }
+    if(cl.contains('closeMe')){
+      ScChrom.WindowController.closeMainwindow();
+    }
+  });
+
+  document.body.addEventListener("mouseleave", () => {
+    document.getElementsByClassName('scchrom_menu')[0].style.display = 'none';
+  });
+
+  document.body.addEventListener("mouseenter", () => {
+    if(ignoreInnerMouse)
+      return;
+    document.getElementsByClassName('scchrom_menu')[0].style.display = 'block';
+  });
+}
+
+function hidePrivacyNote() {
+  // wait for the remind-me-later-button just to dismiss it
+  let elem = document.getElementById('remind-me-later-button');
+  if(!elem){
+    setTimeout(hidePrivacyNote, 100);
+    return;
+  }
+  elem.click();
+}
+
+function hidePremiumAd() {
+  // wait for the youtube premium button and dismiss it
+  let elem = document.getElementById('dismiss-button');
+  if(!elem){
+    setTimeout(hidePremiumAd, 100);
+    return;
+  }
+  elem.click();
+}
+
+async function setFullscreen() {
+  // wait for player to become visible
+  let playerElem = document.getElementById('movie_player');
+  if(!playerElem ){
+    setTimeout(setFullscreen, 100);
+    return;
+  }
+    
+  ignoreInnerMouse = true;
+  
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // make player fullscreen by double clicking it
+  let rect = playerElem.getClientRects()[0];
+  let x = parseInt(rect.x + 100);
+  let y = parseInt(rect.y + 100);
+  ScChrom.InputController.doubleclickInWindow(x,y);
+
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  ignoreInnerMouse = false;
+  
+} 
+
+injectMenu();
+hidePrivacyNote();
+hidePremiumAd();
+setFullscreen();
