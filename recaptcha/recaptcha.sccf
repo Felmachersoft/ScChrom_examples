@@ -1,0 +1,77 @@
+//{"description":"Demonstrates how to simplify recaptcha solving","author":"Felmachersoft","liense":"MIT"}
+
+--url=https://www.google.com/recaptcha/api2/demo
+// show window outside of the visbile screen//
+--window-pos-x=10000
+--window-pos-y=10000
+// prevent stealing focus, unless necessary
+--window-prevent_stealing_focus=true
+// set size to fit the recaptcha window
+--window-width=320
+--window-height=580
+--window-topmost=true
+--window-hide_url_field=true
+--browser-js-allow_objects=InputController
+
+// only show the window if recaptcha needs to be solved
+--on-request-response-utf8<https://www.google.com/recaptcha/api2/payload*>=
+  WindowController.setWindowPosition(-100,-100);
+  WindowController.setWindowState('normal');
+
+--injected-javascript=
+
+// here is the custom handling done after the recaptcha closes
+var handleRecaptchaWindowClosed = function(){
+  // recaptcha solved => click submit button and thats it 
+  // (what needs to be done depends on the use case) 
+  document.getElementById('recaptcha-demo-submit').click();
+}
+
+var getRecaptchaWindow = function(){
+  let iframes = document.getElementsByTagName('iframe');
+  for(let iframe of iframes){
+    if(iframe.src.includes('google.com/recaptcha/api2/bframe')){
+      return iframe.parentNode.parentNode;
+      break;
+    }
+  }
+}
+
+// Wait a bit to let the page finish loading
+setTimeout(
+  () => {
+
+    // get the iframe for the initial click (the one saying "I'm not a robot")
+    let iframes = window.parent.document.getElementsByTagName('iframe');    
+    let iframe = false;
+    for (var i = 0; i < iframes.length; i++) {
+      if (iframes[i].src.startsWith('https://www.google.com/recaptcha/api2/anchor?')) {
+        iframe = iframes[i];
+        break;
+      }
+    }
+    
+    // will be called on the next page
+    if(!iframe) {
+      ScChrom.log('No reCaptcha iframe found.')
+      return;
+    }
+
+    var rect = iframe.getBoundingClientRect();
+
+    // click in middle of the recaptcha field
+    let x = rect.x + (rect.width / 2);
+    let y = rect.y + (rect.height / 2);
+    InputController.clickInWindow(x,y);
+
+    // wait for recaptcha iframe to load and create listener for when it closes (is sovled)
+    setTimeout(() => {
+      let recaptchaWindow = getRecaptchaWindow();
+      new MutationObserver(x => recaptchaWindow.style.opacity == 0 && handleRecaptchaWindowClosed())
+        .observe(recaptchaWindow, { attributes: true, attributeFilter: ['style'] })
+      
+    }, 50);
+
+  },
+  100
+);
