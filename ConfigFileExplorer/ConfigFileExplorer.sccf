@@ -1,0 +1,314 @@
+//{"author":"Felmachersoft","license":"MIT","description":"Example to demonstrate how to use the FilesystemController."}
+--browser-js-allow_objects=FilesystemController
+--window-hide_url_field=true
+
+--injected-javascript=
+  refreshDrives();
+  let ap = await ScChrom.FilesystemController.getAbsolutePath('./');
+  ap = ap.split('\\').join('/');
+  changeDirectory(ap);
+
+--html=
+<html>
+  <style>
+    body{
+      padding:0;
+      margin:0;
+      font-family:calibri;
+    }
+
+    #page {
+      height:100vh;
+      width:100%;
+      padding:0;
+      margin:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    #top{
+      display:flex;
+      flex-basis:1.5em;
+      align-items: center;
+      padding:3px;
+      border-bottom:1px solid lightgray;
+    }
+
+    #menu{
+      display:flex;
+      flex-basis:2em;
+      margin-left:5px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      flex-grow: 1;
+    }
+
+    #drives{
+      cursor:pointer;
+      margin:5px;
+    }
+
+    #drives:hover{
+      background:#ddd;      
+    }
+
+    .directory {
+      cursor:pointer;
+      padding:2px;
+    }
+
+    .pathPart {      
+      border: 1px lightgray solid;      
+      padding-left:5px;
+      white-space: pre;
+    }
+
+    #content {
+      display:flex;
+      flex-wrap:wrap;
+      flex-grow:1;
+      overflow-y: auto;
+      align-content: baseline;
+    }
+
+    .directory:hover{
+      background:#ddd;
+    }
+
+    .item {
+      width: 80px;
+      margin: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .item:hover{
+      background: #ddd;      
+    }
+
+    .itemImage {
+      height:50px;
+      width:50px;
+      background:gray;
+    }
+
+    .fileImage {
+      background-image: url("data:image/svg+xml,%3Csvg width='50.00000000000001' height='50.00000000000001' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ --%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect x='-1' y='-1' width='52' height='52' id='canvas_background' fill='%23fff'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_1' y2='47.32597' x2='10.2292' y1='3.01358' x1='10.05942' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_2' y2='3.6927' x2='27.37691' y1='3.6927' x1='10.2292' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_3' y2='12.35144' x2='36.20543' y1='3.6927' x1='27.37691' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_4' y2='46.81664' x2='35.69609' y1='12.35144' x1='36.20543' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_5' y2='46.81664' x2='10.39898' y1='46.81664' x1='35.69609' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_6' y2='13.03056' x2='26.69779' y1='12.691' x1='36.20543' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_7' y2='4.20203' x2='26.86757' y1='13.03056' x1='26.69779' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3C/g%3E%3C/svg%3E");      
+    }
+
+    .directoryImage {
+      background-image: url("data:image/svg+xml,%3Csvg width='50' height='50' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ --%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect x='-1' y='-1' width='52' height='52' id='canvas_background' fill='%23fff'/%3E%3Cg id='canvasGrid' display='none'%3E%3Crect id='svg_1' width='100%25' height='100%25' x='0' y='0' stroke-width='0' fill='url(%23gridpattern)'/%3E%3C/g%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cline stroke='%23000' stroke-linecap='undefined' stroke-linejoin='undefined' id='svg_2' y2='0.98751' x2='30.24999' y1='1' x1='0' stroke-width='1.5' fill='none'/%3E%3Cline stroke='%23000' stroke-linecap='undefined' stroke-linejoin='undefined' id='svg_3' y2='1.48751' x2='0.25' y1='49.98749' x1='0.25' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' fill='none'/%3E%3Cline stroke-linecap='undefined' stroke-linejoin='undefined' id='svg_4' y2='49.73749' x2='50.24999' y1='49.73749' x1='1' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='undefined' stroke-linejoin='undefined' id='svg_5' y2='10.23751' x2='29.74999' y1='1.73751' x1='29.74999' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='undefined' stroke-linejoin='undefined' id='svg_6' y2='10.73751' x2='50.24999' y1='10.98751' x1='0.75' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='undefined' stroke-linejoin='undefined' id='svg_7' y2='11.48751' x2='49.99999' y1='49.73749' x1='49.74999' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .sccfImage {
+      background-image: url("data:image/svg+xml,%3Csvg width='50.00000000000001' height='50.00000000000001' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ --%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect fill='%23ffffff' id='canvas_background' height='52' width='52' y='-1' x='-1'/%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Crect stroke='%23000' fill='none' stroke-width='1.5' stroke-opacity='null' fill-opacity='null' width='50.15054' height='49.50537' id='svg_8' rx='5'/%3E%3Cline stroke='%23000' stroke-linecap='null' stroke-linejoin='null' id='svg_2' y2='6.82795' x2='7.15053' y1='6.6129' x1='21.55914' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_3' y2='21.88171' x2='7.15053' y1='6.82795' x1='7.36559' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_4' y2='22.09677' x2='6.93548' y1='21.66666' x1='20.26881' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_5' y2='21.45161' x2='21.12903' y1='36.50537' x1='20.91397' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_6' y2='37.15053' x2='20.69892' y1='36.93548' x1='6.93548' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke='%23000' stroke-linecap='null' stroke-linejoin='null' id='svg_7' y2='37.36558' x2='25.4301' y1='7.04301' x1='26.29032' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_9' y2='7.47311' x2='26.93548' y1='7.47311' x1='43.27957' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3Cline stroke-linecap='null' stroke-linejoin='null' id='svg_10' y2='37.36558' x2='26.29032' y1='36.93548' x1='43.06451' fill-opacity='null' stroke-opacity='null' stroke-width='1.5' stroke='%23000' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .itemText {
+      text-align: center;
+      word-break: break-word;
+    }
+
+    #errorBox{
+      position:absolute;
+      bottom:20px;
+      right:20px;
+      border: 1px darkgray solid;
+      color: red;
+      padding: 5px;
+      font-weight: bold;
+    }
+
+    #detailArea{
+      border-top: 1px darkgray solid;
+      min-height: 75px;
+    }
+
+  </style>
+  <head>
+    <title>Config file browser</title>
+  </head>
+  <body>
+    <div id="page">
+      <div id="top">
+        <label>Drive:</label>
+          <select id="drives" name="drives">            
+          </select>
+        <label>Directory:</label>        
+        <div id="menu">                    
+          <div id="path" style="display: flex;">
+          </div>
+        </div>
+      </div>
+      <div id="content">
+        Loading...
+      </div>      
+      <div id="errorBox" style="display:none">
+      </div>
+      <div id="detailArea" style="display:none">
+        
+      </div>
+    </div>
+
+    <script>
+      var refreshDrives = async function(){
+        let drivesJSON = await ScChrom.FilesystemController.getDrives();
+        let drives = JSON.parse(drivesJSON);
+        let drivesElem = document.getElementById('drives');
+
+        // clear old drives
+        var length = drivesElem.options.length;
+        for (i = length-1; i >= 0; i--) {
+          drivesElem.options[i] = null;
+        }
+
+        // add new drives
+        for(let drive of drives){
+          let option = document.createElement("option");
+          option.text = drive.path;
+          option.value = drive.path;
+          drivesElem.add(option);
+        }
+      }
+
+      var getDirectoryContent = async function(directory){
+        let contentJSON = await FilesystemController.getDirectoryContent(directory);
+        return JSON.parse(contentJSON);
+      }
+
+      var refreshPath = function(path){
+        let pathElem = document.getElementById('path');
+        let html = '';
+        let dataPath = '';
+        
+        let parts = path.split('/');
+        for(let part of parts){
+          if(part == '')
+            continue;
+          dataPath += part + '/';
+          html += '<div class="directory pathPart" data-path="' + dataPath + '">' + part + '</div>';
+        }
+        pathElem.innerHTML = html;        
+      }
+
+      var changeDirectory = async function(directory){
+        let content = await getDirectoryContent(directory);        
+
+        if(!content){
+          showError("Can't read content of directory.");
+          return;
+        }
+        hideError();
+        hideDetails();
+
+        // set drive
+        document.getElementById('drives').value = directory.charAt(0) + ':\\';
+
+
+        let contentElem = document.getElementById('content');
+        let html = '';
+
+        for(let item of content){
+          
+          let extraClass = 'directoryImage';
+          if(item.isFile == 'true'){
+            extraClass = 'fileImage';
+            if(item.path.endsWith('.sccf'))
+              extraClass = 'sccfImage';            
+          }
+
+          let itemType = item.isFile == 'true' ? 'file' : 'directory';
+          let itemName = item.path.split('/').pop();
+          itemHTML = `
+          <div class="item ${itemType}" data-path="${item.path}">
+            <div class="itemImage ${extraClass}">
+            </div>
+            <div class="itemText">
+              ${itemName}
+            </div>
+          </div>
+          `;
+          html += itemHTML;
+        }
+
+        contentElem.innerHTML = html;
+        refreshPath(directory);
+      }
+
+      var showError = function(msg){
+        let ebElem = document.getElementById('errorBox');
+        ebElem.innerText = msg;
+        ebElem.style.display = 'block';
+        setTimeout(() => { ebElem.style.display = 'none'}, 15000);
+      }
+
+      var hideError = function(){
+        let ebElem = document.getElementById('errorBox');
+        ebElem.style.display = 'none';
+      }
+
+      var hideDetails = function(filepath){
+        document.getElementById('detailArea').style.display = 'none';
+      }
+
+      var showDetails = async function(filepath){
+        let detailsElem = document.getElementById('detailArea');
+        
+        let content = await ScChrom.FilesystemController.getConfigfileInfos(filepath);
+
+        let html = '';
+        if(content.error){
+          html = '<div>Error occured while reading infos: ' + content.error + ' </div>';
+        } else {
+          html = '<div>';
+          for(let info in content){
+            html += '<div>';
+            html += info + ': ' + content[info];
+            html += '</div>';
+          }
+          html += '</div>'
+        }
+        
+        detailsElem.style.display = 'flex';
+        detailsElem.innerHTML = html;
+      }
+
+      document.addEventListener('click',
+        (e) => {
+
+          
+          for(let elem of e.path){
+            // handle directory change
+            if(elem.classList && elem.classList.contains('directory')){
+              let path = elem.getAttribute('data-path');
+              
+              changeDirectory(path);
+              return;
+            }
+             
+            // handle sccf file click
+            if(elem.classList && elem.classList.contains('file')){
+              let path = elem.getAttribute('data-path');
+              if(path.endsWith('.sccf')){
+                showDetails(path);
+                return;
+              } else {
+                hideDetails();
+              }
+            }
+          }
+          
+        }
+      );
+
+      document.getElementById('drives').onchange = function(){
+        let drivesElem = document.getElementById('drives');
+        let seletedDrive = drivesElem.options[drivesElem.selectedIndex].value;
+        changeDirectory(seletedDrive);
+      };
+
+    </script>
+  </body>
+</html>
