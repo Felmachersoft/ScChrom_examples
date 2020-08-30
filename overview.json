@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Simple map",
+    "description": "Demonstrates how a website can be shown in its own clean window.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  },
+  {
+    "title": "Ping",
+    "previewImageUrl": "",
+    "description": "Demonstrating how to interact with other programs from the browsers JavaScript context.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  },
+  {
+    "title": "Video player",
+    "previewImageUrl": "",
+    "description": "Demonstrates the usage of borderless windows, overlay menus and draggable areas.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  },
+  {
+    "title": "Background pdf",
+    "previewImageUrl": "",
+    "description": "Shows how ScChrom can run without stealing the focus, how to inject custom styles and how to create a pdf file. Will create a file named 'Stocks overview [date].pdf' on the desktop.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  },
+  {
+    "title": "ReCAPTCHA",
+    "previewImageUrl": "",
+    "description": "Shows how ScChrom can be used by other programs to let a user solve google reCAPTCHAs.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  },
+  {
+    "title": "Config file explorer",
+    "previewImageUrl": "",
+    "description": "Demonstrates how the FilesystemController can be used. Click on a .sccf file to show its metadata.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  },
+  {
+    "title": "Customized window",
+    "previewImageUrl": "",
+    "description": "Shows a complex borderless window completely build with Html.",
+    "rawConfigUrl": "",
+    "minVersion" : "1.0.0.0"
+  }
+]
