@@ -1,0 +1,218 @@
+--browser-js-allow_objects=WindowController,NotificationController
+--window-width=400
+--window-height=400
+--window-hide_url_field=true
+--window-border=none
+--background-color=0xFFCCCCCC
+--window-show_notifyicon=true
+
+--initial-script=
+  // prepare function to use it later in the jint context
+  var isPreviewWindow = function(){
+    return WindowController.getWindowSize().height < 200;
+  }
+
+// following two parameters customize the browsers context menu
+--on-before-contextmenu=
+  let ret = {
+    'clear' : true,
+    'entries' : [
+      {
+        'text' : 'show me as preview window',
+        'id' : 1
+      },
+      {
+        'text' : 'minimize me',
+        'id' : 2
+      },
+      {
+        'text' : 'close me',
+        'id' : 3
+      }
+    ]
+  }
+  
+  // in preview mode set only a single entry
+  if(isPreviewWindow()){
+	ret.entries = [
+	  {
+        'text' : 'make me big again',
+        'id' : 4
+      }
+	]
+  }
+  return JSON.stringify(ret)
+--on-click-contextmenu=
+  if(clicked_id == 1){
+    // call callback handled in browser context	
+	BrowserController.callInBrowserCallback('windowChange', 'preview');
+  }
+  if(clicked_id == 2){
+    WindowController.setWindowState('minimized');
+  }
+  if(clicked_id == 3){
+    WindowController.closeMainwindow();
+  }
+  if(clicked_id == 4){
+    // call callback handled in browser context
+	BrowserController.callInBrowserCallback('windowChange', 'normal');
+  }
+
+  
+// customize the notifyicons context menu
+--on-before-notifyicon-contextmenu=
+  let ret = {
+    'clear' : true,
+    'entries' : [
+      {
+        'text' : 'exit',
+        'id' : 'exit'
+      }
+    ]
+  }
+  return JSON.stringify(ret)
+--on-click-notifyicon-contextmenu=
+  if(clicked_id == 'exit'){
+    WindowController.closeMainwindow();
+  }
+
+--html=
+<html>
+  <head>
+    <title>window example</title>
+    <style>
+      body {
+        margin:0;
+        border: 1px solid black;
+        padding-top:30px;
+      }
+      
+      #topbar {
+        position:absolute;
+        background: darkblue;
+        border-bottom: 1px dashed black;
+        height:30px;
+        width:calc(100% - 2px);
+        top:0;
+        margin:0;
+        /* Makes window draggable for this element */
+        -webkit-app-region: drag;
+      }
+
+      #closeBtn{
+        background:lightgray;
+        position:absolute;
+        right:10px;
+        top:7px;        
+        width: 20px;
+        text-align: center;
+        cursor: pointer;
+        /* Necessary to enable clicking the content */
+        -webkit-app-region: no-drag;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="topbar">
+      <div id="closeBtn">
+        X
+      </div>
+    </div>
+      
+    <div id="normalWindow">
+      <button class="moveWindow" data-direction="left" style="position:absolute;left:5px;top:50%;"><</button>
+      <button class="moveWindow" data-direction="right" style="position:absolute;right:5px;top:50%;">></button>
+      <button class="moveWindow" data-direction="up" style="position:absolute;right:50%;top:35px;">up</button>
+      <button class="moveWindow" data-direction="down" style="position:absolute;right:50%;bottom:5%;">down</button>
+      <button id="showMessage" style="position:absolute;right:50%;bottom:50%;">show message</button>
+
+      <div style="position:absolute;left:20%;top:20%;">right click to check the custom context menu</div>
+      <button id="minimize" style="position:absolute;right:50%;bottom:40%;">minimize</button>
+      <button id="maximize" style="position:absolute;right:50%;bottom:30%;">maximize</button>
+      <div style="position:absolute;right:50%;bottom:20%;visibility: none;"> 
+        <input id="setTopmost" type="checkbox" />
+        <label for="setTopmost">set Window Topmost</label>
+      </div>
+    </div>
+
+    <div id="previewWindow" style="display:none;">
+      <label style="margin-top:35px;">This is an example how a preview window could look like</label>
+      <button id="showNormalWindow" style="position:absolute;right:50%;bottom:10%;">Show big window</button>
+    </div>
+
+
+    <script>
+      var moveWindow = async function(direction){
+        let curPos = await WindowController.getWindowPosition();
+
+        let x = curPos.x;
+        let y = curPos.y;
+        let delta = 100;
+
+        switch(direction){
+          case 'up': y -= delta ; break;
+          case 'down': y += delta ; break;
+          case 'left': x -= delta ; break;
+          case 'right': x += delta ; break;
+        }
+
+        WindowController.setWindowPosition(x,y);
+      }
+
+      var toggleTopMost = async function(){
+        let isTopMost = await WindowController.isMainwindowTopmost();
+        WindowController.setMainwindowTopmost(!isTopMost);
+      }
+  
+      var changeWindowType = function(state){
+        if(state == 'preview'){
+	  document.getElementById('normalWindow').style.display = 'none';
+	  document.getElementById('previewWindow').style.display = '';
+	  ScChrom.WindowController.setWindowSize(400,100)
+	  ScChrom.WindowController.setWindowPosition(-1,-20);
+	}
+	if(state == 'normal'){
+	  document.getElementById('normalWindow').style.display = '';
+	  document.getElementById('previewWindow').style.display = 'none';
+	  ScChrom.WindowController.setWindowSize(400,400);
+	  ScChrom.WindowController.setWindowPosition(600,400);
+	}
+      }
+  
+      // necessary to ensure the ScChrom object is initialized,
+      // it is used because the injected-javascript 
+      // parameter doesn't work with the html parameter
+      setTimeout(() => {
+        ScChrom.addCallback('windowChange', (state) => { changeWindowType(state); });
+      }, 200)
+
+      document.addEventListener('click',
+        (e) => {
+          if(e.target.classList.contains('moveWindow')){
+            let dir = e.target.getAttribute('data-direction');
+            moveWindow(dir);
+            return;
+          }
+          if(e.target.id == 'showMessage'){
+            ScChrom.NotificationController.showBaloonInfo('this is the title','this is the content',30000);
+          }
+          if(e.target.id == 'minimize'){
+            ScChrom.WindowController.setWindowState('minimized');
+          }
+          if(e.target.id == 'maximize'){
+            ScChrom.WindowController.setWindowState('maximized');
+          }
+          if(e.target.id == 'setTopmost'){
+            toggleTopMost();
+          }
+          if(e.target.id == 'showNormalWindow'){
+            changeWindowType('normal');
+          }          
+          if(e.target.id == 'closeBtn'){
+            ScChrom.WindowController.closeMainwindow();
+          }
+        }
+      );
+    </script>
+  </body>
+</html>
