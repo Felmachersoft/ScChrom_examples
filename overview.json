@@ -2,7 +2,7 @@
   {
     "title": "Simple map",
     "description": "Demonstrates how a website can be shown in its own clean window.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://github.com/Felmachersoft/ScChrom_examples/raw/master/simple_maps/simple_maps.sccf",
     "minVersion" : "1.0.0.0"
   },
   {
@@ -16,35 +16,35 @@
     "title": "Video player",
     "previewImageUrl": "",
     "description": "Demonstrates the usage of borderless windows, overlay menus and draggable areas.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://github.com/Felmachersoft/ScChrom_examples/raw/master/youtubeTest/youtubeTest.sccf",
     "minVersion" : "1.0.0.0"
   },
   {
     "title": "Background pdf",
     "previewImageUrl": "",
     "description": "Shows how ScChrom can run without stealing the focus, how to inject custom styles and how to create a pdf file. Will create a file named 'Stocks overview [date].pdf' on the desktop.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://github.com/Felmachersoft/ScChrom_examples/raw/master/backgroundPdf/backgroundPdf.sccf",
     "minVersion" : "1.0.0.0"
   },
   {
     "title": "ReCAPTCHA",
     "previewImageUrl": "",
     "description": "Shows how ScChrom can be used by other programs to let a user solve google reCAPTCHAs.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://github.com/Felmachersoft/ScChrom_examples/raw/master/recaptcha/recaptcha.sccf",
     "minVersion" : "1.0.0.0"
   },
   {
     "title": "Config file explorer",
     "previewImageUrl": "",
     "description": "Demonstrates how the FilesystemController can be used. Click on a .sccf file to show its metadata.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://github.com/Felmachersoft/ScChrom_examples/raw/master/ConfigFileExplorer/ConfigFileExplorer.sccf",
     "minVersion" : "1.0.0.0"
   },
   {
     "title": "Customized window",
     "previewImageUrl": "",
     "description": "Shows a complex borderless window completely build with Html.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://github.com/Felmachersoft/ScChrom_examples/raw/master/window_example/windowexample.sccf",
     "minVersion" : "1.0.0.0"
   }
 ]
