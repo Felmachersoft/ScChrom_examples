@@ -9,7 +9,7 @@
     "title": "Ping",
     "previewImageUrl": "",
     "description": "Demonstrating how to interact with other programs from the browsers JavaScript context.",
-    "rawConfigUrl": "",
+    "rawConfigUrl": "https://raw.githubusercontent.com/Felmachersoft/ScChrom_examples/master/ping/ping.sccf",
     "minVersion" : "1.0.0.0"
   },
   {
