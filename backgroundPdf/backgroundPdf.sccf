@@ -1,0 +1,46 @@
+//{"author":"Felmachersoft","license":"MIT","description":"The example shows how ScChrom can run in the background without stealing focus."}
+--url=https://www.bloomberg.com/markets/stocks
+--browser-js-allow_objects=MediaRecordingController,WindowController
+
+// Not necessary to show a window for this one
+--window-state=minimized
+
+// blocks advertisment
+--request-whitelist=*bloomberg.com*|*bwbx.io*
+
+--injected-javascript=
+// wait for the page to load completely
+setTimeout(
+  async () => {
+
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+
+    today = dd + '.' + mm + '.' + yyyy;
+
+    let filename = '%desktop%/Stocks overview ' + today + '.pdf';
+    await ScChrom.MediaRecordingController.createPDF(filename);
+    
+    // wait a bit for pdf creation and close ScChrom
+    setTimeout(WindowController.closeMainwindow, 250);
+  }
+  ,500);
+
+// add custom styles
+--append-to-mainpage=
+<style>
+  /* remove the cookie banner */
+  #consent_blackbar {
+    display : none;
+  }
+  /* remove unnacessary space at top of the page */
+  .leaderboard{
+    display : none;
+  }
+  /* remove bottom news section */
+  .section-front__side-bar{
+    display : none;
+  }
+</style>
